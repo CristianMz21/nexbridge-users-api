@@ -32,6 +32,7 @@ business-result mapping, and returns standardized error responses with
 
 ```bash
 dotnet restore
+dotnet run --project Nexbridge.UsersApi
 ```
 
 When using HTTPS profiles, the API is available from the URL configured in
@@ -140,6 +141,7 @@ Run the complete test suite from the repository root:
 
 ```bash
 dotnet test
+dotnet test --collect:"XPlat Code Coverage"
 ```
 
 ## HTTP Client Examples
