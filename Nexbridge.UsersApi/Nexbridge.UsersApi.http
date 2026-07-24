@@ -7,7 +7,7 @@
 
 ### API root
 @contentType = application/json
-@apiKey = secret-key
+@apiKey = <set-your-api-key-here>
 @sampleUserId = d20a84dc-8fd2-4f8d-9b8c-9a53f4f4ec8c
 
 ### List all users

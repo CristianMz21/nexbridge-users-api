@@ -75,19 +75,27 @@ Key design choices:
 
 ## Configuration
 
-The API is safe to run without API key authentication by default.
-To enable API key protection, set:
+The API can run without API key protection only in `Testing`.
+By default, production-like behavior requires API key protection.
+To configure it, set:
 
-- `Security:ApiKey` in `appsettings.json`
+- `Security:ApiKey` in configuration (prefer `dotnet user-secrets` for local development)
 - or with environment variable `Security__ApiKey`
+
+Example for local development with user secrets:
+
+```bash
+dotnet user-secrets init --project Nexbridge.UsersApi
+dotnet user-secrets set "Security:ApiKey" "super-secret-key" --project Nexbridge.UsersApi
+```
 
 When configured, every request must include:
 
 ```text
-X-Api-Key: your_secret_key
+X-Api-Key: <your_secret_key>
 ```
 
-If the key is missing or invalid, the API returns a `401 Unauthorized`
+If the key is missing or invalid, the API returns `401 Unauthorized`
 `ProblemDetails` response.
 
 ## API Reference

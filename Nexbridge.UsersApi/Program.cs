@@ -40,8 +40,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Optional API key authentication middleware. Configure Security:ApiKey
-// in appsettings when you want to enforce this locally or in production.
+// API key authentication middleware.
+// Configure Security:ApiKey (appsettings or environment variable Security__ApiKey)
+// so every request is authorized with an X-Api-Key header.
 app.UseExceptionHandling();
 app.UseApiKeyAuthentication();
 
