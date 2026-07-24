@@ -13,6 +13,26 @@ namespace Nexbridge.UsersApi.Endpoints;
 /// </summary>
 public static class UserEndpoints
 {
+    private const string UsersTag = "Users";
+
+    private static class OpenApiDocs
+    {
+        public const string GetAllSummary = "List users";
+        public const string GetAllDescription = "Returns the full user catalog ordered by creation timestamp.";
+
+        public const string GetByIdSummary = "Get a user by id";
+        public const string GetByIdDescription = "Returns the user that matches the provided identifier.";
+
+        public const string CreateSummary = "Create user";
+        public const string CreateDescription = "Creates a new user after validating required fields and uniqueness rules.";
+
+        public const string UpdateSummary = "Update user";
+        public const string UpdateDescription = "Replaces an existing user while preserving creation timestamp.";
+
+        public const string DeleteSummary = "Delete user";
+        public const string DeleteDescription = "Deletes an existing user by identifier.";
+    }
+
     /// <summary>
     /// Registers all routes under /users in a single feature group.
     /// </summary>
@@ -20,27 +40,53 @@ public static class UserEndpoints
     {
         // Grouping endpoints improves discoverability and makes
         // route-level metadata (tags, conventions) easier to apply.
-        var group = app.MapGroup("/users").WithTags("Users");
+        var group = app.MapGroup("/users").WithTags(UsersTag);
 
         // GET /users
         group.MapGet("/", GetAllUsers)
-            .WithName("GetAllUsers");
+            .WithName("GetAllUsers")
+            .WithOpenApiMetadata(
+                OpenApiDocs.GetAllSummary,
+                OpenApiDocs.GetAllDescription);
 
         // GET /users/{id}
         group.MapGet("/{id:guid}", GetUserById)
-            .WithName("GetUserById");
+            .WithName("GetUserById")
+            .WithOpenApiMetadata(
+                OpenApiDocs.GetByIdSummary,
+                OpenApiDocs.GetByIdDescription);
 
         // POST /users
         group.MapPost("/", CreateUser)
-            .WithName("CreateUser");
+            .WithName("CreateUser")
+            .WithOpenApiMetadata(
+                OpenApiDocs.CreateSummary,
+                OpenApiDocs.CreateDescription);
 
         // PUT /users/{id}
         group.MapPut("/{id:guid}", UpdateUser)
-            .WithName("UpdateUser");
+            .WithName("UpdateUser")
+            .WithOpenApiMetadata(
+                OpenApiDocs.UpdateSummary,
+                OpenApiDocs.UpdateDescription);
 
         // DELETE /users/{id}
         group.MapDelete("/{id:guid}", DeleteUser)
-            .WithName("DeleteUser");
+            .WithName("DeleteUser")
+            .WithOpenApiMetadata(
+                OpenApiDocs.DeleteSummary,
+                OpenApiDocs.DeleteDescription);
+    }
+
+    private static RouteHandlerBuilder WithOpenApiMetadata(
+        this RouteHandlerBuilder builder,
+        string summary,
+        string description
+    )
+    {
+        return builder
+            .WithSummary(summary)
+            .WithDescription(description);
     }
 
     // Returns all users sorted by CreatedAt, projected to API response DTOs.
