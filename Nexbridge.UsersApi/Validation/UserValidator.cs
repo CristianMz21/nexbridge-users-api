@@ -38,14 +38,14 @@ public static class UserValidator
         return errors;
     }
 
-    public static string NormalizeName(string value)
+    public static string NormalizeName(string? value)
     {
-        return value.Trim();
+        return value?.Trim() ?? string.Empty;
     }
 
-    public static string NormalizeEmail(string value)
+    public static string NormalizeEmail(string? value)
     {
-        return value.Trim().ToLowerInvariant();
+        return (value ?? string.Empty).Trim().ToLowerInvariant();
     }
 
     private static void ValidateName(
@@ -57,20 +57,14 @@ public static class UserValidator
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            errors[fieldName] =
-            [
-                $"{displayName} is required."
-            ];
+            AddError(errors, fieldName, $"{displayName} is required.");
 
             return;
         }
 
-        if (value.Trim().Length > MaximumNameLength)
+        if (value.Length > MaximumNameLength)
         {
-            errors[fieldName] =
-            [
-                $"{displayName} cannot exceed {MaximumNameLength} characters."
-            ];
+            AddError(errors, fieldName, $"{displayName} cannot exceed {MaximumNameLength} characters.");
         }
     }
 
@@ -81,10 +75,7 @@ public static class UserValidator
     {
         if (string.IsNullOrWhiteSpace(email))
         {
-            errors["email"] =
-            [
-                "Email is required."
-            ];
+            AddError(errors, "email", "Email is required.");
 
             return;
         }
@@ -93,10 +84,7 @@ public static class UserValidator
 
         if (normalizedEmail.Length > MaximumEmailLength)
         {
-            errors["email"] =
-            [
-                $"Email cannot exceed {MaximumEmailLength} characters."
-            ];
+            AddError(errors, "email", $"Email cannot exceed {MaximumEmailLength} characters.");
 
             return;
         }
@@ -110,10 +98,7 @@ public static class UserValidator
             )
         )
         {
-            errors["email"] =
-            [
-                "Email format is invalid."
-            ];
+            AddError(errors, "email", "Email format is invalid.");
         }
     }
 
@@ -124,10 +109,16 @@ public static class UserValidator
     {
         if (age is < MinimumAge or > MaximumAge)
         {
-            errors["age"] =
-            [
-                $"Age must be between {MinimumAge} and {MaximumAge}."
-            ];
+            AddError(errors, "age", $"Age must be between {MinimumAge} and {MaximumAge}.");
         }
+    }
+
+    private static void AddError(
+        IDictionary<string, string[]> errors,
+        string fieldName,
+        string error
+    )
+    {
+        errors[fieldName] = [error];
     }
 }
