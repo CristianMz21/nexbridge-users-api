@@ -31,6 +31,7 @@ business-result mapping, and returns standardized error responses with
 ### Run the API
 
 ```bash
+dotnet restore
 ```
 
 When using HTTPS profiles, the API is available from the URL configured in
@@ -138,6 +139,7 @@ Business outcomes are represented by `UserResult` and mapped as:
 Run the complete test suite from the repository root:
 
 ```bash
+dotnet test
 ```
 
 ## HTTP Client Examples
