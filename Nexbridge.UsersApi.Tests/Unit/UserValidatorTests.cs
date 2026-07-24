@@ -1,4 +1,4 @@
-using Nexbridge.UsersApi.Validation;
+using Nexbridge.UsersApi.Application.Validation;
 
 namespace Nexbridge.UsersApi.Tests.Unit;
 

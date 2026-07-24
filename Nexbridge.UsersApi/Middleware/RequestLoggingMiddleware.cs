@@ -34,15 +34,20 @@ public sealed class RequestLoggingMiddleware
             context.Request.Path,
             context.Request.QueryString);
 
-        await _next(context);
-
-        var elapsedMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
-        _logger.LogInformation(
-            "Completed request {Method} {Path} with status {StatusCode} in {ElapsedMs}ms",
-            context.Request.Method,
-            context.Request.Path,
-            context.Response.StatusCode,
-            Math.Round(elapsedMs, 2));
+        try
+        {
+            await _next(context);
+        }
+        finally
+        {
+            var elapsedMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+            _logger.LogInformation(
+                "Completed request {Method} {Path} with status {StatusCode} in {ElapsedMs}ms",
+                context.Request.Method,
+                context.Request.Path,
+                context.Response.StatusCode,
+                Math.Round(elapsedMs, 2));
+        }
     }
 }
 

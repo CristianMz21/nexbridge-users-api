@@ -3,12 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-using Nexbridge.UsersApi.Errors;
-
 namespace Nexbridge.UsersApi.Middleware;
 
 /// <summary>
-/// Converts known domain exceptions into RFC 7807 ProblemDetails responses.
 /// Unexpected exceptions are translated into a generic 500 ProblemDetails body.
 /// </summary>
 public sealed class ExceptionHandlingMiddleware(
@@ -25,10 +22,6 @@ public sealed class ExceptionHandlingMiddleware(
         try
         {
             await next(context);
-        }
-        catch (ApiErrorException error)
-        {
-            await WriteProblemAsync(context, error);
         }
         catch (Exception exception)
         {
@@ -48,30 +41,6 @@ public sealed class ExceptionHandlingMiddleware(
 
             await WriteProblemAsync(context, problem);
         }
-    }
-
-    private async Task WriteProblemAsync(HttpContext context, ApiErrorException error)
-    {
-        var problem = error.ToProblemDetails(context.Request.Path);
-
-        if (error.StatusCode < StatusCodes.Status500InternalServerError)
-        {
-            logger.LogWarning(
-                "Mapped domain exception {ExceptionType} for {Path} -> {StatusCode}",
-                error.GetType().Name,
-                context.Request.Path,
-                problem.Status);
-        }
-        else
-        {
-            logger.LogError(
-                "Mapped domain exception {ExceptionType} for {Path} -> {StatusCode}",
-                error.GetType().Name,
-                context.Request.Path,
-                problem.Status);
-        }
-
-        await WriteProblemAsync(context, problem);
     }
 
     private static async Task WriteProblemAsync(HttpContext context, ProblemDetails problem)

@@ -1,10 +1,7 @@
-using Nexbridge.UsersApi.Models;
+using Nexbridge.UsersApi.Domain.Entities;
 
-namespace Nexbridge.UsersApi.DTOs;
+namespace Nexbridge.UsersApi.Contracts.Users;
 
-/// <summary>
-/// Public shape returned to API clients.
-/// </summary>
 public sealed record UserResponse(
     Guid Id,
     string FirstName,
@@ -15,8 +12,6 @@ public sealed record UserResponse(
     DateTimeOffset? UpdatedAt
 )
 {
-    // Maps internal entity state to the API contract, avoiding leakage of
-    // persistence details into transport responses.
     public static UserResponse FromEntity(User user)
     {
         return new UserResponse(

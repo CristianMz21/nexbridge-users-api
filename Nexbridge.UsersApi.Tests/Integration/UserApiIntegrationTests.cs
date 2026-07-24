@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-using Nexbridge.UsersApi.DTOs;
+using Nexbridge.UsersApi.Contracts.Users;
 using Nexbridge.UsersApi.Tests.Testing;
 
 namespace Nexbridge.UsersApi.Tests.Integration;

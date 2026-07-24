@@ -1,5 +1,5 @@
-using Nexbridge.UsersApi.Data;
-using Nexbridge.UsersApi.Models;
+using Nexbridge.UsersApi.Domain.Entities;
+using Nexbridge.UsersApi.Infrastructure.Persistence;
 
 namespace Nexbridge.UsersApi.Tests.Unit;
 
@@ -20,9 +20,10 @@ public class InMemoryUserRepositoryTests
 
         // Act
         var created = repository.Create(user);
+        Assert.NotNull(created);
 
         // Assert
-        Assert.Equal(user.Id, created.Id);
+        Assert.Equal(user.Id, created!.Id);
         Assert.NotNull(repository.GetById(created.Id));
         Assert.Equal(user.Email, repository.GetByEmail(user.Email)?.Email);
         Assert.Single(repository.GetAll());
@@ -52,8 +53,10 @@ public class InMemoryUserRepositoryTests
             CreatedAt = new DateTimeOffset(2023, 1, 2, 12, 0, 0, TimeSpan.Zero)
         };
 
-        repository.Create(later);
-        repository.Create(earlier);
+        var createdLater = repository.Create(later);
+        var createdEarlier = repository.Create(earlier);
+        Assert.NotNull(createdLater);
+        Assert.NotNull(createdEarlier);
 
         // Act
         var users = repository.GetAll().ToArray();
@@ -78,6 +81,7 @@ public class InMemoryUserRepositoryTests
         };
 
         var created = repository.Create(user);
+        Assert.NotNull(created);
 
         var replacement = new User
         {
@@ -135,7 +139,8 @@ public class InMemoryUserRepositoryTests
             LastName = "Me",
             Email = "delete@example.com",
             Age = 29
-        });
+        })!;
+        Assert.NotNull(user);
 
         // Act
         var removed = repository.Delete(user.Id);

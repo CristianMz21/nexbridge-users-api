@@ -1,6 +1,50 @@
 @Nexbridge.UsersApi_HostAddress = http://localhost:5241
 
-GET {{Nexbridge.UsersApi_HostAddress}}/weatherforecast/
+### List users
+GET {{Nexbridge.UsersApi_HostAddress}}/users
 Accept: application/json
 
 ###
+
+### Create user
+POST {{Nexbridge.UsersApi_HostAddress}}/users
+Content-Type: application/json
+
+{
+  "firstName": "Ana",
+  "lastName": "Taylor",
+  "email": "ana@example.com",
+  "age": 34
+}
+
+###
+
+### Get user by id
+GET {{Nexbridge.UsersApi_HostAddress}}/users/{id}
+Accept: application/json
+
+###
+
+### Update user
+PUT {{Nexbridge.UsersApi_HostAddress}}/users/{id}
+Content-Type: application/json
+
+{
+  "firstName": "David",
+  "lastName": "Blackman",
+  "email": "david@example.com",
+  "age": 26
+}
+
+###
+
+### Delete user
+DELETE {{Nexbridge.UsersApi_HostAddress}}/users/{id}
+Accept: application/json
+
+###
+
+### Optional API key protected usage
+GET {{Nexbridge.UsersApi_HostAddress}}/users
+X-Api-Key: secret-key
+Accept: application/json

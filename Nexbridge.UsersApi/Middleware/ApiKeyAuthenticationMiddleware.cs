@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-
-using Nexbridge.UsersApi.Errors;
 
 namespace Nexbridge.UsersApi.Middleware;
 
@@ -35,7 +34,19 @@ public sealed class ApiKeyAuthenticationMiddleware
         if (!context.Request.Headers.TryGetValue(ApiKeyHeader, out var apiKey)
             || !string.Equals(apiKey, _expectedApiKey, StringComparison.Ordinal))
         {
-            throw new UnauthorizedApiException("A valid X-Api-Key header is required.");
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            context.Response.ContentType = "application/problem+json";
+
+            await context.Response.WriteAsJsonAsync(new ProblemDetails
+            {
+                Type = "https://api.nexbridge.local/problems/unauthorized",
+                Title = "Unauthorized",
+                Detail = "A valid X-Api-Key header is required.",
+                Status = StatusCodes.Status401Unauthorized,
+                Instance = context.Request.Path
+            });
+
+            return;
         }
 
         await _next(context);

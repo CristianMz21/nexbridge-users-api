@@ -1,5 +1,7 @@
-using Nexbridge.UsersApi.Data;
-using Nexbridge.UsersApi.Endpoints;
+using Nexbridge.UsersApi.Application.Interfaces;
+using Nexbridge.UsersApi.Application.Services;
+using Nexbridge.UsersApi.Domain.Abstractions;
+using Nexbridge.UsersApi.Infrastructure.Persistence;
 using Nexbridge.UsersApi.Middleware;
 
 // Build and configure the web application host.
@@ -10,7 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 // - In-memory repository as a singleton for process-lifetime state.
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddControllers();
 builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Build the application pipeline.
 var app = builder.Build();
@@ -33,9 +37,7 @@ app.UseRequestLogging();
 // All requests should pass through HTTPS in hosted environments.
 app.UseHttpsRedirection();
 
-// Keep endpoint composition next to its feature code instead of keeping
-// route registrations inside Program.cs.
-app.MapUserEndpoints();
+app.MapControllers();
 
 app.Run();
 
