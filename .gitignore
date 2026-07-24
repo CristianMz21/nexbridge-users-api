@@ -32,6 +32,12 @@ appsettings.*.local.json
 # Logs
 *.log
 
+# Tooling / agent metadata
+.agents/
+.claude/
+.kiro/
+skills-lock.json
+
 # OS
 .DS_Store
 Thumbs.db
