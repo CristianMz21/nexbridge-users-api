@@ -1,5 +1,6 @@
 using Nexbridge.UsersApi.Data;
 using Nexbridge.UsersApi.Endpoints;
+using Nexbridge.UsersApi.Middleware;
 
 // Build and configure the web application host.
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +20,13 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Optional API key authentication middleware. Configure Security:ApiKey
+// in appsettings when you want to enforce this locally or in production.
+app.UseApiKeyAuthentication();
+
+// Request + response logging middleware for observability.
+app.UseRequestLogging();
 
 // All requests should pass through HTTPS in hosted environments.
 app.UseHttpsRedirection();
