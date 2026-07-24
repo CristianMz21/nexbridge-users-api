@@ -1,0 +1,24 @@
+{
+  "version": 2,
+  "dgSpecHash": "W4GHTK7QbcU=",
+  "success": true,
+  "projectFilePath": "/home/mackroph/Projectos/Learning/NET/nexbridge-users-api/Nexbridge.UsersApi/Nexbridge.UsersApi.csproj",
+  "expectedPackageFiles": [
+    "/home/mackroph/.nuget/packages/microsoft.aspnetcore.openapi/10.0.9/microsoft.aspnetcore.openapi.10.0.9.nupkg.sha512",
+    "/home/mackroph/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1903",
+      "level": "Warning",
+      "message": "Package 'Microsoft.OpenApi' 2.0.0 has a known high severity vulnerability, https://github.com/advisories/GHSA-v5pm-xwqc-g5wc",
+      "projectPath": "/home/mackroph/Projectos/Learning/NET/nexbridge-users-api/Nexbridge.UsersApi/Nexbridge.UsersApi.csproj",
+      "warningLevel": 1,
+      "filePath": "/home/mackroph/Projectos/Learning/NET/nexbridge-users-api/Nexbridge.UsersApi/Nexbridge.UsersApi.csproj",
+      "libraryId": "Microsoft.OpenApi",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}

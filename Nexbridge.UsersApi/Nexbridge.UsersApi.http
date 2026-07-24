@@ -1,0 +1,6 @@
+@Nexbridge.UsersApi_HostAddress = http://localhost:5241
+
+GET {{Nexbridge.UsersApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
