@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Nexbridge.UsersApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a8ae4fb7b6d8115b1b3bc0dc121de87f51eae0c")]
 [assembly: System.Reflection.AssemblyProductAttribute("Nexbridge.UsersApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Nexbridge.UsersApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
