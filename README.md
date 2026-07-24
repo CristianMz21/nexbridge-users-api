@@ -1,41 +1,61 @@
 # Nexbridge Users API
 
-An ASP.NET Core Web API that manages users in memory using a clean, layered
-architecture for learning and demonstration purposes.
+Nexbridge Users API is a compact ASP.NET Core Web API that demonstrates a clean,
+layered architecture for user management operations.
 
-## What this API provides
+The API exposes CRUD endpoints for users, validates input, applies deterministic
+business-result mapping, and returns standardized error responses with
+`ProblemDetails`.
 
-- Create, list, update, and delete users
-- Input validation and normalized payloads
-- Conflict and not-found error handling with RFC 7807 `ProblemDetails`
-- Optional API key authentication via `X-Api-Key`
-- Layered project structure (`Application`, `Domain`, `Infrastructure`, `Contracts`)
-- Unit and integration tests with `xUnit`
+## Table of Contents
 
-## Tech stack
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Configuration](#configuration)
+- [API Reference](#api-reference)
+- [Validation Rules](#validation-rules)
+- [Error Handling](#error-handling)
+- [Testing](#testing)
+- [HTTP Client Examples](#http-client-examples)
+- [Repository Maintenance](#repository-maintenance)
+- [License](#license)
 
-- .NET 10 / ASP.NET Core Web API
-- Minimal hosting model with controllers
-- OpenAPI in development
+## Quick Start
 
-## Project structure
+### Prerequisites
+
+- .NET SDK 10.0
+- Git
+- A REST client (browser extension, Postman, curl, or VS Code REST Client)
+
+### Run the API
+
+```bash
+```
+
+When using HTTPS profiles, the API is available from the URL configured in
+`Properties/launchSettings.json`.
+
+## Architecture
+
+The solution uses clear separation of concerns across well-defined layers:
 
 ```text
 Nexbridge.UsersApi
-├── Application/
+├── Application/            Business logic and use cases
 │   ├── Interfaces/
 │   ├── Results/
 │   ├── Services/
 │   └── Validation/
 ├── Contracts/
-│   └── Users/
-├── Controllers/
-├── Domain/
+│   └── Users/             API request/response contracts
+├── Controllers/            HTTP surface area
+├── Domain/                 Core abstractions and entities
 │   ├── Abstractions/
 │   └── Entities/
 ├── Infrastructure/
-│   └── Persistence/
-└── Middleware/
+│   └── Persistence/       Repository implementation
+└── Middleware/             Cross-cutting request behavior
 
 Nexbridge.UsersApi.Tests
 ├── Integration/
@@ -43,120 +63,104 @@ Nexbridge.UsersApi.Tests
 └── Unit/
 ```
 
-## Endpoints
+Key design choices:
 
-Base path: `/users`
+- Business rules are encapsulated in `Application` services.
+- Persistence is isolated behind domain abstractions.
+- The API boundary uses typed contracts for request and response payloads.
+- Unexpected exceptions are handled by centralized middleware.
 
-### GET `/users`
+## Configuration
 
-- Returns all users
-- `200 OK` with `UserResponse[]`
+The API is safe to run without API key authentication by default.
+To enable API key protection, set:
 
-### GET `/users/{id}`
+- `Security:ApiKey` in `appsettings.json`
+- or with environment variable `Security__ApiKey`
 
-- Returns one user by id
-- `200 OK` with `UserResponse`
-- `404 Not Found` with `ProblemDetails` when missing
-
-### POST `/users`
-
-- Creates a new user
-- Request body:
-
-  ```json
-  {
-    "firstName": "Ana",
-    "lastName": "Taylor",
-    "email": "ana@example.com",
-    "age": 34
-  }
-  ```
-
-- Success: `201 Created` with created resource and `Location: /users/{id}`
-- Validation errors: `400 Bad Request` with `ValidationProblemDetails`
-- Duplicate email: `409 Conflict` with `ProblemDetails`
-
-### PUT `/users/{id}`
-
-- Updates an existing user
-- Same payload shape as POST
-- Success: `200 OK` with updated `UserResponse`
-- Missing user: `404 Not Found`
-- Duplicate email: `409 Conflict`
-- Validation: `400 Bad Request`
-
-### DELETE `/users/{id}`
-
-- Deletes an existing user
-- Success: `204 No Content`
-- Missing user: `404 Not Found`
-
-## Data and validation rules
-
-- `firstName` and `lastName` are required and must be at most 100 characters
-- `email` is required, max 254 characters, and must be valid format
-- `age` must be between 1 and 120
-- Inputs are normalized (`trim`, email lower-case)
-
-## Storage model
-
-The API uses an in-memory repository (`InMemoryUserRepository`) for now.
-State is process-lifetime only and resets on restart.
-
-## Error handling
-
-- Expected business errors return deterministic `UserResult` outcomes from the
-  application layer and map to `400`, `404`, or `409`.
-- Unexpected errors are caught by global middleware and returned as a generic
-  `500` `ProblemDetails` response.
-- Optional API key middleware is active when `Security:ApiKey` is configured.
-
-## Run locally
-
-```bash
-dotnet restore
-dotnet run --project Nexbridge.UsersApi
-```
-
-By default, HTTPS redirection is enabled and the API serves on the configured
-launch URL from `launchSettings.json`.
-
-### Api key
-
-Configure with app settings or environment variables:
-
-- `Security:ApiKey` (for example `your_secret_key`)
-
-When set, every request must include:
+When configured, every request must include:
 
 ```text
 X-Api-Key: your_secret_key
 ```
 
-When unset/blank, authentication is skipped.
+If the key is missing or invalid, the API returns a `401 Unauthorized`
+`ProblemDetails` response.
 
-## Tests
+## API Reference
+
+Base path: `/users`.
+
+| Method | Endpoint | Description | Success Response |
+|---|---|---|---|
+| `GET` | `/users` | Retrieve all users | `200 OK` (`UserResponse[]`) |
+| `GET` | `/users/{id}` | Retrieve one user by identifier | `200 OK` (`UserResponse`) |
+| `POST` | `/users` | Create a new user | `201 Created` (`UserResponse`) |
+| `PUT` | `/users/{id}` | Replace an existing user | `200 OK` (`UserResponse`) |
+| `DELETE` | `/users/{id}` | Remove a user | `204 No Content` |
+
+### Example payload
+
+```json
+{
+  "firstName": "Ana",
+  "lastName": "Taylor",
+  "email": "ana@example.com",
+  "age": 34
+}
+```
+
+### Typical status codes
+
+- `400 Bad Request` – validation errors
+- `404 Not Found` – user does not exist
+- `409 Conflict` – duplicate email
+- `500 Internal Server Error` – unexpected failure
+
+## Validation Rules
+
+- `firstName` and `lastName` are required and limited to 100 characters.
+- `email` is required, limited to 254 characters, and must be valid.
+- `age` must be between `1` and `120`.
+- Input values are normalized (`trim` + email lowercase) before processing.
+
+## Error Handling
+
+Business outcomes are represented by `UserResult` and mapped as:
+
+- `InvalidInput` → `400` with `ValidationProblemDetails`
+- `NotFound` → `404` with `ProblemDetails`
+- `EmailConflict` / update conflict → `409` with `ProblemDetails`
+- Unexpected exceptions → `500` with generic `ProblemDetails`
+
+## Testing
+
+Run the complete test suite from the repository root:
 
 ```bash
-dotnet test
-dotnet test --collect:"XPlat Code Coverage"
 ```
+
+## HTTP Client Examples
+
+Use the included file:
+
+- `Nexbridge.UsersApi/Nexbridge.UsersApi.http`
+
+It contains ready-to-run examples for:
+
+- List users
+- Create user
+- Get user by id
+- Update user
+- Delete user
+- Validation and conflict scenarios
+- API key scenarios
+
+## Repository Maintenance
+
+- Build artifacts are excluded via `.gitignore` (`bin/`, `obj/`, `.vs/`, etc.).
+- The repository is organized for incremental learning and clean API experimentation.
 
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-
-## Creating/pushing to GitHub with `gh`
-
-- This project is ready to be pushed to an existing GitHub repository.
-- If you want to create a new repository from scratch, use:
-
-```bash
-gh repo create <owner>/<repo> --source . --public --push
-```
-
-- If the repository already exists, just push:
-
-```bash
-git push
-```
