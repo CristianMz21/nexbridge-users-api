@@ -4,11 +4,14 @@ using Microsoft.Extensions.Configuration;
 
 namespace Nexbridge.UsersApi.Tests.Testing;
 
-public sealed class UserApiApplicationFactory(string? apiKey = null) : WebApplicationFactory<Program>
+public sealed class UserApiApplicationFactory(string? apiKey = null, string? environment = null)
+    : WebApplicationFactory<Program>
 {
+    private readonly string? _environment = environment;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(_environment ?? "Testing");
 
         builder.ConfigureAppConfiguration((_, config) =>
         {

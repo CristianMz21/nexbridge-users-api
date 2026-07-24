@@ -253,7 +253,7 @@ public class UserApiIntegrationTests
     }
 
     [Fact]
-    public async Task ApiKeyMiddleware_WhenApiKeyMissing_ReturnsUnauthorized()
+    public async Task ApiKeyMiddleware_WhenApiKeyConfiguredInTestingEnvironmentAndHeaderMissing_ReturnsUnauthorized()
     {
         // Arrange
         using var factory = new UserApiApplicationFactory("secret-key");
@@ -274,6 +274,49 @@ public class UserApiIntegrationTests
         Assert.Equal("A valid X-Api-Key header is required.", payload.Detail);
         Assert.Equal("/users", payload.Instance);
         Assert.Equal("https://api.nexbridge.local/problems/unauthorized", payload.Type);
+    }
+
+    [Fact]
+    public async Task ApiKeyMiddleware_WhenApiKeyMissingAndNotConfiguredInNonTestingEnvironment_ReturnsUnauthorized()
+    {
+        // Arrange
+        using var factory = new UserApiApplicationFactory(environment: "Development");
+        using var client = factory.CreateClient(new()
+        {
+            AllowAutoRedirect = false
+        });
+
+        // Act
+        using var response = await client.GetAsync("/users");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        var payload = await response.Content.ReadFromJsonAsync<ProblemPayload>(JsonOptions);
+        Assert.NotNull(payload);
+        Assert.Equal("Unauthorized", payload!.Title);
+        Assert.Equal((int)HttpStatusCode.Unauthorized, payload.Status);
+        Assert.Equal("API key is not configured. Set Security:ApiKey in configuration.", payload.Detail);
+        Assert.Equal("/users", payload.Instance);
+        Assert.Equal("https://api.nexbridge.local/problems/unauthorized", payload.Type);
+    }
+
+    [Fact]
+    public async Task ApiKeyMiddleware_WhenApiKeyConfiguredInNonTestingEnvironmentAndHeaderValid_ReturnsSuccess()
+    {
+        // Arrange
+        const string apiKey = "secret-key";
+        using var factory = new UserApiApplicationFactory(apiKey, "Development");
+        using var client = factory.CreateClient(new()
+        {
+            AllowAutoRedirect = false
+        });
+        client.DefaultRequestHeaders.Add("X-Api-Key", apiKey);
+
+        // Act
+        using var response = await client.GetAsync("/users");
+
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
