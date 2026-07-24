@@ -13,6 +13,7 @@ business-result mapping, and returns standardized error responses with
 - [Architecture](#architecture)
 - [Configuration](#configuration)
 - [API Reference](#api-reference)
+- [API Documentation (Swagger)](#api-documentation-swagger)
 - [Validation Rules](#validation-rules)
 - [Error Handling](#error-handling)
 - [Testing](#testing)
@@ -118,6 +119,16 @@ Base path: `/users`.
 - `404 Not Found` – user does not exist
 - `409 Conflict` – duplicate email
 - `500 Internal Server Error` – unexpected failure
+
+## API Documentation (Swagger)
+
+Interactive documentation is available with Swagger UI in Development:
+
+- Swagger JSON: `http://localhost:<port>/swagger/v1/swagger.json`
+- Swagger UI: `http://localhost:<port>/swagger`
+
+For this repository default local endpoint naming, `<port>` is the HTTP port shown
+when running `dotnet run --project Nexbridge.UsersApi`.
 
 ## Validation Rules
 
