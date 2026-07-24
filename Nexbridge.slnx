@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Nexbridge.UsersApi/Nexbridge.UsersApi.csproj" />
+  <Project Path="Nexbridge.UsersApi.Tests/Nexbridge.UsersApi.Tests.csproj" />
 </Solution>
