@@ -1,18 +1,22 @@
-@Nexbridge.UsersApi_HostAddress = http://localhost:5241
+@Nexbridge_UsersApi_HostAddress = http://localhost:5241
+
+# Note:
+# The "Request '...' has not been sent" diagnostics are normal until you run
+# the previous named request (CreateValidUser / CreateUser1). Run those first
+# or use "REST Client: Send All Requests" on this file.
 
 ### API root
-@Nexbridge.UsersApi_HostAddress = http://localhost:5241
 @contentType = application/json
 @apiKey = secret-key
 @sampleUserId = d20a84dc-8fd2-4f8d-9b8c-9a53f4f4ec8c
 
 ### List all users
-GET {{Nexbridge.UsersApi_HostAddress}}/users
+GET {{Nexbridge_UsersApi_HostAddress}}/users
 Accept: {{contentType}}
 
 ### Create a valid user
 # @name CreateValidUser
-POST {{Nexbridge.UsersApi_HostAddress}}/users
+POST {{Nexbridge_UsersApi_HostAddress}}/users
 Content-Type: {{contentType}}
 
 {
@@ -23,25 +27,25 @@ Content-Type: {{contentType}}
 }
 
 ### Get user by id
-GET {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
+GET {{Nexbridge_UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
 Accept: {{contentType}}
 
 ### Update a user
-PUT {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
+PUT {{Nexbridge_UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
 Content-Type: {{contentType}}
 
 {
   "firstName": "Ana",
   "lastName": "Johnson",
-  "email": "ana.johnson@example.com",
+  "email": "ana.johnson@update.com",
   "age": 35
 }
 
 ### Delete user
-DELETE {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
+DELETE {{Nexbridge_UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
 
 ### Request with invalid data (validation errors)
-POST {{Nexbridge.UsersApi_HostAddress}}/users
+POST {{Nexbridge_UsersApi_HostAddress}}/users
 Content-Type: {{contentType}}
 
 {
@@ -52,11 +56,11 @@ Content-Type: {{contentType}}
 }
 
 ### Check not-found user
-GET {{Nexbridge.UsersApi_HostAddress}}/users/{{sampleUserId}}
+GET {{Nexbridge_UsersApi_HostAddress}}/users/{{sampleUserId}}
 Accept: {{contentType}}
 
 ### Create duplicate email
-POST {{Nexbridge.UsersApi_HostAddress}}/users
+POST {{Nexbridge_UsersApi_HostAddress}}/users
 Content-Type: {{contentType}}
 
 {
@@ -67,7 +71,7 @@ Content-Type: {{contentType}}
 }
 
 ### Try duplicate email
-POST {{Nexbridge.UsersApi_HostAddress}}/users
+POST {{Nexbridge_UsersApi_HostAddress}}/users
 Content-Type: {{contentType}}
 
 {
@@ -79,7 +83,7 @@ Content-Type: {{contentType}}
 
 ### Create two users then update with conflicting email
 # @name CreateUser1
-POST {{Nexbridge.UsersApi_HostAddress}}/users
+POST {{Nexbridge_UsersApi_HostAddress}}/users
 Content-Type: {{contentType}}
 
 {
@@ -90,7 +94,7 @@ Content-Type: {{contentType}}
 }
 
 # @name CreateUser2
-POST {{Nexbridge.UsersApi_HostAddress}}/users
+POST {{Nexbridge_UsersApi_HostAddress}}/users
 Content-Type: {{contentType}}
 
 {
@@ -101,7 +105,10 @@ Content-Type: {{contentType}}
 }
 
 ### Force email conflict on update
-PUT {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateUser1.response.body.id}}
+# This request is standalone. If you want a dynamic conflict flow, first run the two
+# "CreateUser" requests above and replace `sampleUserId` with the id returned by
+# CreateUser1.
+PUT {{Nexbridge_UsersApi_HostAddress}}/users/{{sampleUserId}}
 Content-Type: {{contentType}}
 
 {
@@ -112,10 +119,10 @@ Content-Type: {{contentType}}
 }
 
 ### API key missing (when API key is configured in app settings)
-GET {{Nexbridge.UsersApi_HostAddress}}/users
+GET {{Nexbridge_UsersApi_HostAddress}}/users
 Accept: {{contentType}}
 
 ### API key provided (when API key is configured in app settings)
-GET {{Nexbridge.UsersApi_HostAddress}}/users
+GET {{Nexbridge_UsersApi_HostAddress}}/users
 X-Api-Key: {{apiKey}}
 Accept: {{contentType}}

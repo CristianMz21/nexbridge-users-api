@@ -171,6 +171,16 @@ It contains ready-to-run examples for:
 - Validation and conflict scenarios
 - API key scenarios
 
+When using the HTTP client file with VS Code REST Client:
+
+- Requests that reference `CreateValidUser.response.body.id` require that request to be sent first.
+- Request `CreateUser1` is optional for conflict tests; by default the final conflict test uses
+  `sampleUserId` and `@sampleUserId` is pre-populated.
+- If you prefer dynamic chaining, run the request groups in sequence (or use **Send All Requests**),
+  then replace `@sampleUserId` with the generated id from `CreateUser1`.
+- If you see a warning like `Request 'CreateUser1' has not been sent`, it means the dependency has
+  not been executed in the current run context.
+
 ## Repository Maintenance
 
 - Build artifacts are excluded via `.gitignore` (`bin/`, `obj/`, `.vs/`, etc.).
