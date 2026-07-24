@@ -45,13 +45,15 @@ public sealed class InMemoryUserRepository : IUserRepository
 
     public bool Update(User user)
     {
-        if (!_users.ContainsKey(user.Id))
+        while (_users.TryGetValue(user.Id, out var currentUser))
         {
-            return false;
+            if (_users.TryUpdate(user.Id, user, currentUser))
+            {
+                return true;
+            }
         }
 
-        _users[user.Id] = user;
-        return true;
+        return false;
     }
 
     public bool Delete(Guid id)
