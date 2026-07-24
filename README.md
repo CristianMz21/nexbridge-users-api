@@ -138,7 +138,13 @@ When unset/blank, authentication is skipped.
 ## Tests
 
 ```bash
+dotnet test
+dotnet test --collect:"XPlat Code Coverage"
 ```
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ## Creating/pushing to GitHub with `gh`
 
