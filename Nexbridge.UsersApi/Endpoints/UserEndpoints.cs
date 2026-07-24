@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 
 using Nexbridge.UsersApi.Data;
 using Nexbridge.UsersApi.DTOs;
+using Nexbridge.UsersApi.Errors;
 using Nexbridge.UsersApi.Models;
 using Nexbridge.UsersApi.Validation;
 
@@ -110,10 +111,7 @@ public static class UserEndpoints
 
         if (user is null)
         {
-            return TypedResults.NotFound(new
-            {
-                message = $"User '{id}' was not found."
-            });
+            throw new NotFoundApiException("User", id);
         }
 
         return TypedResults.Ok(UserResponse.FromEntity(user));
@@ -139,7 +137,7 @@ public static class UserEndpoints
 
         if (validationErrors.Any())
         {
-            return TypedResults.ValidationProblem(validationErrors);
+            throw new ValidationApiException(validationErrors);
         }
 
         // Email uniqueness is a repository-level business rule checked
@@ -148,11 +146,9 @@ public static class UserEndpoints
 
         if (emailAlreadyExists is not null)
         {
-            return TypedResults.Problem(
-                detail: "A user with this email already exists.",
-                title: "Email already exists.",
-                statusCode: StatusCodes.Status409Conflict
-            );
+            throw new ConflictApiException(
+                "Email already exists.",
+                "A user with this email already exists.");
         }
 
         var user = new User
@@ -189,7 +185,7 @@ public static class UserEndpoints
 
         if (validationErrors.Any())
         {
-            return TypedResults.ValidationProblem(validationErrors);
+            throw new ValidationApiException(validationErrors);
         }
 
         // Must ensure the target exists before updating and protect
@@ -198,21 +194,16 @@ public static class UserEndpoints
 
         if (currentUser is null)
         {
-            return TypedResults.NotFound(new
-            {
-                message = $"User '{id}' was not found."
-            });
+            throw new NotFoundApiException("User", id);
         }
 
         var emailOwner = repository.GetByEmail(normalizedEmail);
 
         if (emailOwner is not null && emailOwner.Id != id)
         {
-            return TypedResults.Problem(
-                detail: "Another user already uses this email.",
-                title: "Email already exists.",
-                statusCode: StatusCodes.Status409Conflict
-            );
+            throw new ConflictApiException(
+                "Email already exists.",
+                "Another user already uses this email.");
         }
 
         var updatedUser = new User
@@ -230,11 +221,9 @@ public static class UserEndpoints
 
         if (!updateSucceeded)
         {
-            return TypedResults.Problem(
-                detail: "User was not updated. It may have changed during the request.",
-                title: "Concurrent update conflict.",
-                statusCode: StatusCodes.Status409Conflict
-            );
+            throw new ConflictApiException(
+                "Concurrent update conflict.",
+                "User was not updated. It may have changed during the request.");
         }
 
         return TypedResults.Ok(UserResponse.FromEntity(updatedUser));
@@ -250,10 +239,7 @@ public static class UserEndpoints
 
         if (!deleted)
         {
-            return TypedResults.NotFound(new
-            {
-                message = $"User '{id}' was not found."
-            });
+            throw new NotFoundApiException("User", id);
         }
 
         return TypedResults.NoContent();

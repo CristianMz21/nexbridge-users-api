@@ -11,11 +11,18 @@ public sealed record UserResponseDto(
 );
 
 public sealed record ValidationProblemPayload(
-    Dictionary<string, string[]>? Errors
+    string? Title,
+    string? Detail,
+    int? Status,
+    string? Type,
+    Dictionary<string, string[]>? Errors,
+    string? Instance
 );
 
 public sealed record ProblemPayload(
     string? Title,
     string? Detail,
-    int? Status
+    int? Status,
+    string? Type,
+    string? Instance
 );

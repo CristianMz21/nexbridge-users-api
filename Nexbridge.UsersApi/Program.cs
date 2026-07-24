@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Register services used by the API.
 // - OpenAPI endpoint metadata for local documentation.
 // - In-memory repository as a singleton for process-lifetime state.
+builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<IUserRepository, InMemoryUserRepository>();
 
@@ -23,6 +24,7 @@ if (app.Environment.IsDevelopment())
 
 // Optional API key authentication middleware. Configure Security:ApiKey
 // in appsettings when you want to enforce this locally or in production.
+app.UseExceptionHandling();
 app.UseApiKeyAuthentication();
 
 // Request + response logging middleware for observability.

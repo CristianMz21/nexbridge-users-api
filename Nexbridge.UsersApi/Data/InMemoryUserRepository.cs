@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 
+using Nexbridge.UsersApi.Errors;
 using Nexbridge.UsersApi.Models;
 
 namespace Nexbridge.UsersApi.Data;
@@ -40,12 +41,13 @@ public sealed class InMemoryUserRepository : IUserRepository
     }
 
     // Inserts a new user. If the generated id already exists, this is considered
-    // a rare conflict and is surfaced as an InvalidOperationException.
+    // a rare conflict and is surfaced as a ConflictApiException.
     public User Create(User user)
     {
         if (!_users.TryAdd(user.Id, user))
         {
-            throw new InvalidOperationException(
+            throw new ConflictApiException(
+                "Concurrent create conflict.",
                 $"Could not create the user with ID '{user.Id}'."
             );
         }

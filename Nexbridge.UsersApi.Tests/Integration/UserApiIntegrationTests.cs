@@ -161,6 +161,9 @@ public class UserApiIntegrationTests
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemPayload>(JsonOptions);
         Assert.NotNull(problem);
+        Assert.Equal((int)HttpStatusCode.BadRequest, problem!.Status);
+        Assert.Equal("Validation failed", problem.Title);
+        Assert.Equal("One or more validation errors were found.", problem.Detail);
         Assert.NotNull(problem!.Errors);
         Assert.Contains("firstName", problem.Errors.Keys);
         Assert.Contains("lastName", problem.Errors.Keys);
@@ -184,6 +187,13 @@ public class UserApiIntegrationTests
 
         // Assert
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ProblemPayload>(JsonOptions);
+        Assert.NotNull(problem);
+        Assert.Equal((int)HttpStatusCode.NotFound, problem!.Status);
+        Assert.Equal("Not Found", problem.Title);
+        Assert.Equal($"User '{missingId}' was not found.", problem.Detail);
+        Assert.Equal($"/users/{missingId}", problem.Instance);
+        Assert.Equal("https://api.nexbridge.local/problems/not-found", problem.Type);
     }
 
     [Fact]
@@ -209,6 +219,9 @@ public class UserApiIntegrationTests
         var problem = await response.Content.ReadFromJsonAsync<ProblemPayload>(JsonOptions);
         Assert.NotNull(problem);
         Assert.Equal("Email already exists.", problem!.Title);
+        Assert.Equal((int)HttpStatusCode.Conflict, problem.Status);
+        Assert.Equal("A user with this email already exists.", problem.Detail);
+        Assert.Equal("https://api.nexbridge.local/problems/conflict", problem.Type);
     }
 
     [Fact]
@@ -234,6 +247,9 @@ public class UserApiIntegrationTests
         var problem = await response.Content.ReadFromJsonAsync<ProblemPayload>(JsonOptions);
         Assert.NotNull(problem);
         Assert.Equal("Email already exists.", problem!.Title);
+        Assert.Equal((int)HttpStatusCode.Conflict, problem.Status);
+        Assert.Equal("Another user already uses this email.", problem.Detail);
+        Assert.Equal("https://api.nexbridge.local/problems/conflict", problem.Type);
     }
 
     [Fact]
@@ -254,6 +270,10 @@ public class UserApiIntegrationTests
         var payload = await response.Content.ReadFromJsonAsync<ProblemPayload>(JsonOptions);
         Assert.NotNull(payload);
         Assert.Equal("Unauthorized", payload!.Title);
+        Assert.Equal((int)HttpStatusCode.Unauthorized, payload.Status);
+        Assert.Equal("A valid X-Api-Key header is required.", payload.Detail);
+        Assert.Equal("/users", payload.Instance);
+        Assert.Equal("https://api.nexbridge.local/problems/unauthorized", payload.Type);
     }
 
     [Fact]
