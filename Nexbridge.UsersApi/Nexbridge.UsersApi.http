@@ -1,14 +1,19 @@
 @Nexbridge.UsersApi_HostAddress = http://localhost:5241
 
-### List users
+### API root
+@Nexbridge.UsersApi_HostAddress = http://localhost:5241
+@contentType = application/json
+@apiKey = secret-key
+@sampleUserId = d20a84dc-8fd2-4f8d-9b8c-9a53f4f4ec8c
+
+### List all users
 GET {{Nexbridge.UsersApi_HostAddress}}/users
-Accept: application/json
+Accept: {{contentType}}
 
-###
-
-### Create user
+### Create a valid user
+# @name CreateValidUser
 POST {{Nexbridge.UsersApi_HostAddress}}/users
-Content-Type: application/json
+Content-Type: {{contentType}}
 
 {
   "firstName": "Ana",
@@ -17,34 +22,100 @@ Content-Type: application/json
   "age": 34
 }
 
-###
-
 ### Get user by id
-GET {{Nexbridge.UsersApi_HostAddress}}/users/{id}
-Accept: application/json
+GET {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
+Accept: {{contentType}}
 
-###
-
-### Update user
-PUT {{Nexbridge.UsersApi_HostAddress}}/users/{id}
-Content-Type: application/json
+### Update a user
+PUT {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
+Content-Type: {{contentType}}
 
 {
-  "firstName": "David",
-  "lastName": "Blackman",
-  "email": "david@example.com",
-  "age": 26
+  "firstName": "Ana",
+  "lastName": "Johnson",
+  "email": "ana.johnson@example.com",
+  "age": 35
 }
 
-###
-
 ### Delete user
-DELETE {{Nexbridge.UsersApi_HostAddress}}/users/{id}
-Accept: application/json
+DELETE {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateValidUser.response.body.id}}
 
-###
+### Request with invalid data (validation errors)
+POST {{Nexbridge.UsersApi_HostAddress}}/users
+Content-Type: {{contentType}}
 
-### Optional API key protected usage
+{
+  "firstName": "",
+  "lastName": "",
+  "email": "not-an-email",
+  "age": 0
+}
+
+### Check not-found user
+GET {{Nexbridge.UsersApi_HostAddress}}/users/{{sampleUserId}}
+Accept: {{contentType}}
+
+### Create duplicate email
+POST {{Nexbridge.UsersApi_HostAddress}}/users
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Frank",
+  "lastName": "Miller",
+  "email": "frank@example.com",
+  "age": 40
+}
+
+### Try duplicate email
+POST {{Nexbridge.UsersApi_HostAddress}}/users
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Frank",
+  "lastName": "Miller",
+  "email": "frank@example.com",
+  "age": 40
+}
+
+### Create two users then update with conflicting email
+# @name CreateUser1
+POST {{Nexbridge.UsersApi_HostAddress}}/users
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Gina",
+  "lastName": "Doe",
+  "email": "gina@example.com",
+  "age": 20
+}
+
+# @name CreateUser2
+POST {{Nexbridge.UsersApi_HostAddress}}/users
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Henry",
+  "lastName": "Page",
+  "email": "henry@example.com",
+  "age": 22
+}
+
+### Force email conflict on update
+PUT {{Nexbridge.UsersApi_HostAddress}}/users/{{CreateUser1.response.body.id}}
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Gina",
+  "lastName": "Doe",
+  "email": "henry@example.com",
+  "age": 21
+}
+
+### API key missing (when API key is configured in app settings)
 GET {{Nexbridge.UsersApi_HostAddress}}/users
-X-Api-Key: secret-key
-Accept: application/json
+Accept: {{contentType}}
+
+### API key provided (when API key is configured in app settings)
+GET {{Nexbridge.UsersApi_HostAddress}}/users
+X-Api-Key: {{apiKey}}
+Accept: {{contentType}}
